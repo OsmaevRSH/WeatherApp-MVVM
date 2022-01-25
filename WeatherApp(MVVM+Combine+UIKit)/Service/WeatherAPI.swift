@@ -19,7 +19,7 @@ class WeatherAPI {
 		let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)
 		
 		let qQuery = URLQueryItem(name: "q", value: city)
-		let appidQuery = URLQueryItem(name: "appid", value: "f79fcc0b3457d2c73dfbb3a5328ce8ff")
+		let appidQuery = URLQueryItem(name: "appid", value: apiKey)
 		let unitsQuery = URLQueryItem(name: "units", value: "metric")
 		
 		guard var urlComponents = urlComponents else { return nil }
@@ -38,7 +38,7 @@ class WeatherAPI {
 			return Just(WeatherModel.placeholder).eraseToAnyPublisher()
 		}
 		return URLSession.shared.dataTaskPublisher(for: url)
-			.map{$0.data}
+			.map {$0.data}
 			.decode(type: WeatherModel.self, decoder: JSONDecoder())
 			.catch {error in Just(WeatherModel.placeholder)}
 			.receive(on: RunLoop.main, options: nil)

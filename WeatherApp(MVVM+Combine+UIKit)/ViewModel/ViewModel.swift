@@ -21,6 +21,7 @@ final class ViewModel : ObservableObject {
 			.flatMap {
 				(city: String) -> AnyPublisher<WeatherModel, Never> in
 				WeatherAPI.shared.getWeather(city: city)
+				print("Call")
 			}
 			.assign(to: \.weather, on: self)
 			.store(in: &cancelableSet)

@@ -8,20 +8,20 @@
 import Foundation
 import Combine
 
-final class ViewModel : ObservableObject {
-	@Published var city = "Moscow"
+class ViewModel {
+	
+	@Published var city = "London"
 	@Published var weather = WeatherModel.placeholder
 	
 	private var cancelableSet: Set<AnyCancellable> = []
 	
 	init() {
 		$city
-			.debounce(for: 0.3, scheduler: RunLoop.main, options: nil)
+			.debounce(for: .milliseconds(500), scheduler: RunLoop.main, options: nil)
 			.removeDuplicates()
 			.flatMap {
 				(city: String) -> AnyPublisher<WeatherModel, Never> in
 				WeatherAPI.shared.getWeather(city: city)
-				print("Call")
 			}
 			.assign(to: \.weather, on: self)
 			.store(in: &cancelableSet)

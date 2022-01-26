@@ -14,8 +14,7 @@ extension UITextField {
 		NotificationCenter
 			.default
 			.publisher(for: UITextField.textDidChangeNotification, object: self)
-			.compactMap {$0.object as? UITextField}
-			.map {$0.text ?? ""}
+			.compactMap {($0.object as? UITextField)?.text}
 			.eraseToAnyPublisher()
 	}
 }

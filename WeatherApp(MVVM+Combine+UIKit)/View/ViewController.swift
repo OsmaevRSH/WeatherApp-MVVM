@@ -12,7 +12,7 @@ class ViewController: UIViewController {
 
 	private let viewModel = ViewModel()
 	
-	private var canceleble: Set<AnyCancellable> = []
+	private var cancelebleSet: Set<AnyCancellable> = []
 	
 	private let appNameTitle: UILabel = {
 		var label = UILabel()
@@ -33,11 +33,10 @@ class ViewController: UIViewController {
 		return textField
 	}()
 	
-	private lazy var tumpertureLabel: UILabel = {
+	private let tumpertureLabel: UILabel = {
 		var label = UILabel()
 		label.translatesAutoresizingMaskIntoConstraints = false
 		label.clipsToBounds = true
-		label.text = "Температура ...ºC"
 		return label
 	}()
 	
@@ -47,6 +46,7 @@ class ViewController: UIViewController {
 		addConstraints()
 		let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
 		view.addGestureRecognizer(tap)
+		binding()
 	}
 	
 	private func addSubviews() {
@@ -55,23 +55,27 @@ class ViewController: UIViewController {
 		view.addSubview(tumpertureLabel)
 	}
 	
+	// MARK: - Combine
 	private func binding() {
 		cityTextField
 			.textPublisher
 			.assign(to: \.city, on: viewModel)
-			.store(in: &canceleble)
-		
+			.store(in: &cancelebleSet)
+
 		viewModel
 			.$weather
 			.sink { [weak self] weatherModel in
-				self?.tumpertureLabel.text =
-				weatherModel.main?.temp != nil ?
-				("Температура \(weatherModel.main?.temp ?? -200) ºC") :
-				"Error ...ºC"
+				if let tempr = weatherModel.main?.temp {
+					self?.tumpertureLabel.text = ("Температура \(tempr) ºC")
+				}
+				else {
+					self?.tumpertureLabel.text = "Температура undefined ºC"
+				}
 			}
-			.store(in: &canceleble)
+			.store(in: &cancelebleSet)
 	}
 	
+	// MARK: - Constraints
 	private func addConstraints() {
 		NSLayoutConstraint.activate([
 			// MARK: - appNameTitle
